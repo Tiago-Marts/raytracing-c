@@ -35,9 +35,6 @@ int main(void) {
 
     fclose(f);
 
-    Vec3 teste;
-    vec3_init(&teste, 0.1, 2.0, 1.5);
-    vec3_print(&teste);
 
 
     return 0;
