@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 typedef struct vec3 {
     double x;
@@ -39,24 +40,24 @@ void vec3_cross_prod(Vec3* u, Vec3* v, Vec3* w){
 
 void vec3_vec_add(Vec3* u, Vec3* v, Vec3* w){
     w->x = u->x + v->x;
-    w->y = u->y + v->x;
+    w->y = u->y + v->y;
     w->z = u->y + v->z;
 }
 
 void vec3_vec_sub(Vec3* u, Vec3* v, Vec3* w){
     w->x = u->x - v->x;
-    w->y = u->y - v->x;
-    w->z = u->y - v->z;
+    w->y = u->y - v->y;
+    w->z = u->z - v->z;
 }
 
 void vec3_vec_mult(Vec3* u, Vec3* v, Vec3* w){
     w->x = u->x * v->x;
-    w->y = u->y * v->x;
+    w->y = u->y * v->y;
     w->z = u->y * v->z;
 }
 
 double vec3_length(Vec3* u){
-    return u->x * u->x + u->y * u->y + u->z * u->z;
+    return sqrt((u->x * u->x) + (u->y * u->y) + (u->z * u->z));
 }
 
 void vec3_normalize(Vec3* u){
