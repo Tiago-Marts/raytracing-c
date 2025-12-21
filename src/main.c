@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../include/utils/vec3.h"
+#include "../include/utils/color.h"
 
 int main(void) {
     const int height = 1024;
@@ -19,17 +20,9 @@ int main(void) {
     for(int y = 0; y < height ; y++){
         printf("Progresso: %d / %d \n", (y+1), height);
         for(int x = 0; x < width; x++){
-            double r = ((double) x) / (width - 1);
-            double g = ((double) y) / (height - 1);
-            double b = 0.0;
-
-            int ir = (int)(255.999 * r);
-            int ig = (int)(255.999 * g);
-            int ib = (int)(255.999 * b);
-
-            fputc(ir, f);
-            fputc(ig, f);
-            fputc(ib, f);
+            Color pixel_color;
+            color_init(&pixel_color, ((double) x) / (width-1),  ((double) y) / (height - 1), 0.0);
+            write_color(f, &pixel_color);
         }
     }
 
