@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../include/utils/vec3.h"
 
 int main(void) {
     const int height = 1024;
@@ -13,8 +14,10 @@ int main(void) {
     fprintf(f, "%d\n", height);
     fprintf(f, "255\n");
 
+
     //Imagem Teste
     for(int y = 0; y < height ; y++){
+        printf("Progresso: %d / %d \n", (y+1), height);
         for(int x = 0; x < width; x++){
             double r = ((double) x) / (width - 1);
             double g = ((double) y) / (height - 1);
@@ -31,6 +34,11 @@ int main(void) {
     }
 
     fclose(f);
+
+    Vec3 teste;
+    vec3_init(&teste, 0.1, 2.0, 1.5);
+    vec3_print(&teste);
+
 
     return 0;
 }
