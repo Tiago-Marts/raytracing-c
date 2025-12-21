@@ -1,13 +1,41 @@
 #include <stdio.h>
+#include <math.h>
 #include "../include/utils/vec3.h"
 #include "../include/utils/color.h"
 #include "../include/utils/ray.h"
 
-//Função temporária para teste
+//Função de intersecção de esfera
+double hit_sphere( Vec3* sphere_center, double radius, Ray* r){
+    Vec3 oc;
+    vec3_vec_sub(sphere_center, &(r->origin), &oc);
+
+    double a = vec3_dot_prod(&(r->direction), &(r->direction));
+    double b = -2.0 * (vec3_dot_prod(&(r->direction), &oc));
+    double c = vec3_dot_prod(&oc, &oc) - radius * radius;
+    double discriminant = b * b - 4 * a * c;
+
+
+
+    return discriminant;
+}
+
+
+
 Color ray_color(Ray* r){
     Vec3 unit_direction = r->direction;
     vec3_normalize(&unit_direction);
-    
+
+    Vec3 sphere_center = {0,0,-1};
+    double disc = hit_sphere(&sphere_center, 0.5, r);
+    if( disc > 0.0) {
+        Vec3 n;
+        point_at(r, 0.5, &n);
+        vec3_vec_sub(&n, &sphere_center, &n);
+        vec3_normalize(&n);
+
+        Color d = {n.x*0.5 + 0.5,n.y*0.5 + 0.5, n.z*0.5 + 0.5};
+        return d;
+    }
     double t = 0.5 * (unit_direction.y + 1.0);
 
     Color start = {1.0,1.0,1.0};
@@ -87,7 +115,7 @@ int main(void) {
 
     //Render
     for(int y = 0; y < height ; y++){
-        
+        printf("Progresso: %d / %d \n", y+1, height);
         for(int x = 0; x < width; x++){
             Vec3 pixel_u = pixel_delta_u;
             Vec3 pixel_v = pixel_delta_v;
