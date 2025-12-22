@@ -27,6 +27,12 @@ void vec3_scalar_div(Vec3* point, double a){
     point->z *= (1.0/a);
 }
 
+void vec3_scalar_add(Vec3 *point, double a){
+    point->x += a;
+    point->y += a;
+    point->z += a;
+}
+
 //Operações vetoriais
 double vec3_dot_prod(Vec3* u, Vec3* v) {
     return u->x * v->x + u->y * v->y + u->z * v->z;
@@ -41,7 +47,7 @@ void vec3_cross_prod(Vec3* u, Vec3* v, Vec3* w){
 void vec3_vec_add(Vec3* u, Vec3* v, Vec3* w){
     w->x = u->x + v->x;
     w->y = u->y + v->y;
-    w->z = u->y + v->z;
+    w->z = u->z + v->z;
 }
 
 void vec3_vec_sub(Vec3* u, Vec3* v, Vec3* w){
@@ -53,7 +59,7 @@ void vec3_vec_sub(Vec3* u, Vec3* v, Vec3* w){
 void vec3_vec_mult(Vec3* u, Vec3* v, Vec3* w){
     w->x = u->x * v->x;
     w->y = u->y * v->y;
-    w->z = u->y * v->z;
+    w->z = u->z * v->z;
 }
 
 double vec3_length(Vec3* u){
