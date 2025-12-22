@@ -1,24 +1,23 @@
-#include <stdio.h>
-#include <math.h>
-#include "../include/utils/vec3.h"
-#include "../include/utils/color.h"
-#include "../include/utils/ray.h"
+#include "../include/utils/common.h"
+#include "../include/utils/sphere.h"
+#include "../include/utils/hittables_list_sphere.h"
+#include <limits.h>
 
 //Função de intersecção de esfera
-double hit_sphere( Vec3* sphere_center, double radius, Ray* r){
+double hit_sphere_intersection( Vec3* sphere_center, double radius, Ray* r){
     Vec3 oc;
     vec3_vec_sub(sphere_center, &(r->origin), &oc);
 
 
-    double a = vec3_dot_prod(&(r->direction), &(r->direction));
-    double b = -2.0 * (vec3_dot_prod(&(r->direction), &oc));
-    double c = vec3_dot_prod(&oc, &oc) - radius * radius;
-    double discriminant = b * b - 4 * a * c;
+    double a = vec3_lenght_squared(&(r->direction));
+    double b = vec3_dot_prod(&(r->direction), &oc);
+    double c = vec3_lenght_squared(&oc) - radius * radius;
+    double discriminant = b * b -  a * c;
 
     if(discriminant < 0){
         discriminant = -1.0;
     } else {
-        discriminant = (-b - sqrt(discriminant)) / (2.0 * a);
+        discriminant = (b - sqrt(discriminant)) /( a);
     }
 
     return discriminant;
@@ -26,21 +25,19 @@ double hit_sphere( Vec3* sphere_center, double radius, Ray* r){
 
 
 
-Color ray_color(Ray* r){
-    
-    Vec3 sphere_center = {0.0,0.0,-1.0};
-    double disc = hit_sphere(&sphere_center, 0.5, r);
-    if( disc > 0.0) {
-        Vec3 n;
-        point_at(r, disc, &n);
-        vec3_vec_sub(&n, &sphere_center, &n);
-        vec3_normalize(&n);
-        vec3_scalar_mult(&n, 0.5);
-        vec3_scalar_add(&n, 0.5);
-        Color d = {n.x,n.y,n.z};
-        return d;
-    }
+Color ray_color(Ray* r, Hittable_List* world){
+    Hittable hit;
+    if(hit_list(world, r, 0.0, 10000000.0, &hit)){
+        Vec3 d = {1.0,1.0,1.0};
+        Vec3 e = hit.normal;
 
+        vec3_vec_add(&e, &d, &e);
+        vec3_scalar_mult(&e, 0.5);
+
+        Color o = {e.x, e.y, e.z};
+        return o;
+    }
+    
     Vec3 unit_direction = r->direction;
     vec3_normalize(&unit_direction);
     double t = 0.5 * (unit_direction.y + 1.0);
@@ -64,6 +61,27 @@ int main(void) {
     int width = 800;
     int height = (int) (width / aspect_ratio);
     height = (height < 1) ? 1 : height;
+
+    //World 
+    //NOTA: Por enquanto, tudo é feito de esferas, então há somente a lista de hits para esferas
+    Hittable_List world;
+    init_list(&world, 10);
+
+    //Esfera 1
+    Sphere s;
+    Vec3 s_center = {0, 0, -1.0};
+    sphere_init(&s, s_center, 0.5);
+    add_sphere(&world, s);
+
+    //Esfera 2
+    Sphere s2;
+    Vec3 s2_center = {0, -100.5, -1.0};
+    sphere_init(&s2, s2_center, 100);
+    add_sphere(&world, s2);
+
+
+
+
     
     //Viewport & Camera
     const double focal_lenght = 1.0; //Focal lenght é a distância do centro do viewport ao centro da câmera
@@ -94,8 +112,6 @@ int main(void) {
     vec3_init(&view_focal, 0.0, 0.0, focal_lenght);
     vec3_scalar_div(&viewport_u_half, 2.0);
     vec3_scalar_div(&viewport_v_half, 2.0);
-    vec3_print(&viewport_v_half);
-    printf("\n");
 
     Vec3 viewport_upper_left;
     
@@ -146,13 +162,13 @@ int main(void) {
 
 
             Color pixel_color;
-            pixel_color = ray_color(&r);
+            pixel_color = ray_color(&r, &world);
             write_color(f, &pixel_color);
         }
     }
 
     fclose(f);
-
+    free_list(&world);
 
 
     return 0;

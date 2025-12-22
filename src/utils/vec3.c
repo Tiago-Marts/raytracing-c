@@ -62,8 +62,12 @@ void vec3_vec_mult(Vec3* u, Vec3* v, Vec3* w){
     w->z = u->z * v->z;
 }
 
+double vec3_lenght_squared(Vec3* u){
+    return (u->x * u->x) + (u->y * u->y) + (u->z * u->z);
+}
+
 double vec3_length(Vec3* u){
-    return sqrt((u->x * u->x) + (u->y * u->y) + (u->z * u->z));
+    return sqrt(vec3_lenght_squared(u));
 }
 
 void vec3_normalize(Vec3* u){

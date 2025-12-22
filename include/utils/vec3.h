@@ -31,6 +31,8 @@ void vec3_vec_sub(Vec3* u, Vec3* v, Vec3* w);
 
 void vec3_vec_mult(Vec3* u, Vec3* v, Vec3* w);
 
+double vec3_lenght_squared(Vec3* u);
+
 double vec3_length(Vec3* u);
 
 void vec3_normalize(Vec3* u);
