@@ -126,13 +126,17 @@ Color ray_color(Ray* r, Hittable_List* world){
     interval_init(&world_ray, 0.0, 1000000.0);
 
     if(hit_list(world, r, &world_ray, &hit)){
-        Vec3 d = {1.0,1.0,1.0};
-        Vec3 e = hit.normal;
+        Vec3 direction;
+        vec3_random_hemisphere(&direction, &(hit.normal));
 
-        vec3_vec_add(&e, &d, &e);
-        vec3_scalar_mult(&e, 0.5);
+        Ray reflected;
+        reflected.origin = hit.point;
+        reflected.direction = direction;
 
-        Color o = {e.x, e.y, e.z};
+        Color o = ray_color(&reflected, world);
+        o.r *= 0.5;
+        o.g *= 0.5;
+        o.b *= 0.5;
         return o;
     }
     

@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <math.h>
+#include "../../include/utils/math_functions.h"
 
 typedef struct vec3 {
     double x;
     double y;
     double z;
 } Vec3;
+
+
 
 //Inicializar um ponto
 void vec3_init(Vec3* point, double x, double y, double z){
@@ -74,8 +77,48 @@ void vec3_normalize(Vec3* u){
     vec3_scalar_div(u, vec3_length(u));
 }
 
+void vec3_random(Vec3* u){
+    u->x = random_double();
+    u->y = random_double();
+    u->z = random_double();
+}
+
+void vec3_random_minmax(Vec3* u, double min, double max){
+    u->x = random_double_minmax(min, max);
+    u->y = random_double_minmax(min, max);
+    u->z = random_double_minmax(min, max);
+}
+
+//Metodo da rejeição para escolha de um vetor unitário
+void vec3_random_unit(Vec3* u){
+    while(1){
+        vec3_random_minmax(u, -1.0, 1.0);
+        double lensq = vec3_lenght_squared(u);
+
+        //Para lidar com imprecisão de floats
+        if(1e-160 < lensq && lensq <= 1){
+            vec3_scalar_div(u, lensq);
+            return;
+        }
+    }
+}
+
+//Escolha de um vetor em um hemisfério de raio 1
+void vec3_random_hemisphere(Vec3* u, Vec3* normal){
+    Vec3 on_unit_sphere;
+    vec3_random_unit(&on_unit_sphere);
+
+    *u = on_unit_sphere;
+    if(vec3_dot_prod(&on_unit_sphere, normal) < 0.0) {
+        vec3_scalar_mult(u, -1.0);
+    } 
+        
+}
+
 //Funções utilitárias
 void vec3_print(Vec3* u){
     printf("%f, %f, %f", u->x, u->y, u->z);
 }
+
+
 

@@ -37,7 +37,21 @@ double vec3_length(Vec3* u);
 
 void vec3_normalize(Vec3* u);
 
+void vec3_random(Vec3* u);
+
+void vec3_random_minmax(Vec3* u, double min, double max);
+
+
+//Metodo da rejeição para escolha de um vetor unitário
+void vec3_random_unit(Vec3* u);
+
+
+//Escolha de um vetor em um hemisfério de raio 1
+void vec3_random_hemisphere(Vec3* u, Vec3* normal);
+
+
 //Funções utilitárias
 void vec3_print(Vec3* u);
+
 
 #endif
