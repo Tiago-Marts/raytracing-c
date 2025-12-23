@@ -135,7 +135,8 @@ Color ray_color(Ray* r, Hittable_List* world, int depth){
 
     if(hit_list(world, r, &world_ray, &hit)){
         Vec3 direction;
-        vec3_random_hemisphere(&direction, &(hit.normal));
+        vec3_random_unit(&direction);
+        vec3_vec_add(&direction, &(hit.normal), &direction);
 
         Ray reflected;
         reflected.origin = hit.point;
