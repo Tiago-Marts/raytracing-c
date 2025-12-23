@@ -4,6 +4,7 @@
 #include "../../include/utils/vec3.h"
 #include "../../include/utils/ray.h"
 #include "../../include/utils/hittable.h"
+#include "../../include/utils/interval.h"
 #include <math.h>
 
 typedef struct sphere{
@@ -13,6 +14,6 @@ typedef struct sphere{
 
 void sphere_init(Sphere* sphere, Vec3 center, double radius);
 
-int hit_sphere(Sphere* sphere, Ray* r, double ray_tmin, double ray_tmax, Hittable* rec);
+int hit_sphere(Sphere* sphere, Ray* r, Interval* ray_t, Hittable* rec);
 
 #endif

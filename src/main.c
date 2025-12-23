@@ -27,7 +27,9 @@ double hit_sphere_intersection( Vec3* sphere_center, double radius, Ray* r){
 
 Color ray_color(Ray* r, Hittable_List* world){
     Hittable hit;
-    if(hit_list(world, r, 0.0, 10000000.0, &hit)){
+    Interval world_ray;
+    interval_init(&world_ray, 0.0, 1000000.0);
+    if(hit_list(world, r, &world_ray, &hit)){
         Vec3 d = {1.0,1.0,1.0};
         Vec3 e = hit.normal;
 
@@ -78,6 +80,19 @@ int main(void) {
     Vec3 s2_center = {0, -100.5, -1.0};
     sphere_init(&s2, s2_center, 100);
     add_sphere(&world, s2);
+
+    //Esfera 3
+    Sphere s3;
+    Vec3 s3_center = {0.75, 0, -1.5};
+    sphere_init(&s3, s3_center, 0.25);
+    add_sphere(&world, s3);
+
+    //Esfera 4
+    Sphere s4;
+    Vec3 s4_center = {-0.25, 0, -0.25};
+    sphere_init(&s4, s4_center, 0.25);
+    add_sphere(&world, s4);
+
 
 
 
@@ -138,7 +153,7 @@ int main(void) {
 
     //Render
     for(int y = 0; y < height ; y++){
-        //printf("Progresso: %d / %d \n", y+1, height);
+        printf("Progresso: %d / %d \n", y+1, height);
         for(int x = 0; x < width; x++){
             Vec3 pixel_u = pixel_delta_u;
             Vec3 pixel_v = pixel_delta_v;

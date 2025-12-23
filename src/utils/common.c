@@ -6,6 +6,7 @@
 //Arquivos headers do projeto
 #include "../../include/utils/color.h"
 #include "../../include/utils/ray.h"
+#include "../../include/utils/interval.h"
 #include "../../include/utils/vec3.h"
 
 //Constants

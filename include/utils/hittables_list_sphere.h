@@ -5,6 +5,7 @@
 #include "../../include/utils/hittable.h"
 #include "../../include/utils/sphere.h"
 #include "../../include/utils/ray.h"
+#include "../../include/utils/interval.h"
 
 typedef struct hittable_list{
     size_t list_size;
@@ -21,7 +22,7 @@ void add_sphere(Hittable_List* h, Sphere object);
 
 void remove_hittable(Hittable_List* h, int index);
 
-int hit_list(Hittable_List* h, Ray* r, double ray_tmin, double ray_tmax, Hittable* rec);
+int hit_list(Hittable_List* h, Ray* r, Interval* ray_t, Hittable* rec);
 //void print_list
 
 #endif

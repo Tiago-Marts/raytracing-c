@@ -1,6 +1,8 @@
 #include "../../include/utils/vec3.h"
 #include "../../include/utils/ray.h"
 #include "../../include/utils/hittable.h"
+#include "../../include/utils/interval.h"
+
 #include <math.h>
 
 typedef struct sphere{
@@ -14,7 +16,7 @@ void sphere_init(Sphere* sphere, Vec3 center, double radius){
     sphere->radius = radius;
 }
 
-int hit_sphere(Sphere* sphere, Ray* r, double ray_tmin, double ray_tmax, Hittable* rec) {
+int hit_sphere(Sphere* sphere, Ray* r, Interval* ray_t, Hittable* rec) {
     int hitted = 1;
     Vec3 oc;
     Vec3 center = sphere->center;
@@ -31,9 +33,9 @@ int hit_sphere(Sphere* sphere, Ray* r, double ray_tmin, double ray_tmax, Hittabl
 
     //Acha a raiz que está num limite aceitável (entre o ray_tmin e ray_tmax)
     double root = (b - sqrt_discriminant) / (a);
-    if(root <= ray_tmin || ray_tmax <= root){
+    if(!interval_surrounds(ray_t, root)){
         root = (b + sqrt_discriminant) / (a);
-        if(root <= ray_tmin || ray_tmax <= root) {
+        if(!interval_surrounds(ray_t, root)) {
             hitted = 0;
         }
     }
