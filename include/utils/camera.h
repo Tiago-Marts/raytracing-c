@@ -11,6 +11,7 @@
 typedef struct camera {
     int samples_per_pixel;
     double pixel_samples_scale;
+    int max_depth;
     int width;
     int height;
     double aspect_ratio;

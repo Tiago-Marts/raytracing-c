@@ -10,6 +10,7 @@ int main(void) {
     cam.aspect_ratio = 16.0/9.0;
     cam.width = 400;
     cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
 
     //World 
     //NOTA: Por enquanto, tudo é feito de esferas, então há somente a lista de hits para esferas
@@ -33,13 +34,13 @@ int main(void) {
     Sphere s3;
     Vec3 s3_center = {0.75, 0, -1.5};
     sphere_init(&s3, s3_center, 0.25);
-    add_sphere(&world, s3);
+    //add_sphere(&world, s3);
 
     //Esfera 4
     Sphere s4;
     Vec3 s4_center = {-0.25, 0, -0.25};
     sphere_init(&s4, s4_center, 0.25);
-    add_sphere(&world, s4);
+    //add_sphere(&world, s4);
 
     //Render
     render(&cam, &world, "image.ppm");

@@ -8,6 +8,7 @@
 typedef struct camera {
     int samples_per_pixel;
     double pixel_samples_scale;
+    int max_depth;
     int width;
     int height;
     double aspect_ratio;
@@ -60,6 +61,7 @@ void camera_initialize(Camera* cam){
     if(cam->width == 0.0) cam->width = 800;
     if(cam->aspect_ratio == 0.0) cam->aspect_ratio = 16.0/9.0;
     if(cam->samples_per_pixel == 0.0) cam->samples_per_pixel = 10;
+    if(cam->max_depth == 0) cam->max_depth = 10;
 
      //Image
     double aspect_ratio = cam->aspect_ratio;
@@ -120,10 +122,16 @@ void camera_initialize(Camera* cam){
 }
 
 //Obtem a cor dos objetos a partir da lista de colisão
-Color ray_color(Ray* r, Hittable_List* world){
+Color ray_color(Ray* r, Hittable_List* world, int depth){
     Hittable hit;
     Interval world_ray;
-    interval_init(&world_ray, 0.0, 1000000.0);
+    interval_init(&world_ray, 0.001, 1000000.0);
+
+    //Não há mais luz para ser coletada
+    if (depth <= 0){
+        Color max_d = {0.0,0.0,0.0};
+        return max_d;
+    }
 
     if(hit_list(world, r, &world_ray, &hit)){
         Vec3 direction;
@@ -133,7 +141,7 @@ Color ray_color(Ray* r, Hittable_List* world){
         reflected.origin = hit.point;
         reflected.direction = direction;
 
-        Color o = ray_color(&reflected, world);
+        Color o = ray_color(&reflected, world, depth-1);
         o.r *= 0.5;
         o.g *= 0.5;
         o.b *= 0.5;
@@ -180,7 +188,7 @@ void render(Camera* cam, Hittable_List* world, const char* path){
             for(int sample = 0; sample < cam->samples_per_pixel; sample++){
                 Ray r;
                 get_ray(&r, cam, x, y);
-                Color c = ray_color(&r, world);
+                Color c = ray_color(&r, world, cam->max_depth);
                 pixel_color.r += c.r;
                 pixel_color.g += c.g;
                 pixel_color.b += c.b;
