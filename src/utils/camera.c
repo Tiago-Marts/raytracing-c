@@ -1,4 +1,4 @@
-
+#include "../../include/utils/common.h"
 #include "../../include/utils/hittable.h"
 #include "../../include/utils/color.h"
 #include "../../include/utils/interval.h"
@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 typedef struct camera {
+    int samples_per_pixel;
+    double pixel_samples_scale;
     int width;
     int height;
     double aspect_ratio;
@@ -16,11 +18,48 @@ typedef struct camera {
     Vec3 pixel_delta_v;
 } Camera;
 
+//Constroi um vetor dentro de um quadrado unitário, apontando pra uma direação qualquer nesse quadrado
+void sample_square(Vec3* v){
+    double x = random_double() - 0.5;
+    double y = random_double() - 0.5;
+
+    v->x = x;
+    v->y = y;
+    v->z = 0.0;
+}
+
+//Constroi um raio saindo da origem da camera em direção a um ponto aleatório próximo de (i,j)
+void get_ray(Ray* r, Camera* cam, int i, int j){
+    Vec3 offset;
+    sample_square(&offset);
+
+
+    Vec3 pixel_u = cam->pixel_delta_u;
+    double x = (i + offset.x);
+    vec3_scalar_mult(&pixel_u, x);
+
+    Vec3 pixel_v = cam->pixel_delta_v;
+    double y = (j + offset.y);
+    vec3_scalar_mult(&pixel_v, y);
+
+    Vec3 pixel_sample = cam->pixel00_loc;
+    vec3_vec_add(&pixel_sample, &pixel_u, &pixel_sample);
+    vec3_vec_add(&pixel_sample, &pixel_v, &pixel_sample);
+
+    Vec3 ray_origin = cam->center;
+    Vec3 ray_direction;
+    vec3_vec_sub(&pixel_sample, &ray_origin, &ray_direction);
+
+    r->origin = ray_origin;
+    r->direction = ray_direction;
+}
+
 //Camera
 void camera_initialize(Camera* cam){
     //Inicialização default
     if(cam->width == 0.0) cam->width = 800;
     if(cam->aspect_ratio == 0.0) cam->aspect_ratio = 16.0/9.0;
+    if(cam->samples_per_pixel == 0.0) cam->samples_per_pixel = 10;
 
      //Image
     double aspect_ratio = cam->aspect_ratio;
@@ -28,6 +67,7 @@ void camera_initialize(Camera* cam){
     int height = (int) (width / aspect_ratio);
     height = (height < 1) ? 1 : height;
     cam->height = height;
+    cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
 
     //Viewport & Camera
     const double focal_lenght = 1.0; //Focal lenght é a distância do centro do viewport ao centro da câmera
@@ -131,29 +171,24 @@ void render(Camera* cam, Hittable_List* world, const char* path){
     for(int y = 0; y < height ; y++){
         printf("Progresso: %d / %d \n", y+1, height);
         for(int x = 0; x < width; x++){
-            Vec3 pixel_u = cam->pixel_delta_u;
-            Vec3 pixel_v = cam->pixel_delta_v;
 
+            Color pixel_color = {0.0, 0.0, 0.0};
+            for(int sample = 0; sample < cam->samples_per_pixel; sample++){
+                Ray r;
+                get_ray(&r, cam, x, y);
+                Color c = ray_color(&r, world);
+                pixel_color.r += c.r;
+                pixel_color.g += c.g;
+                pixel_color.b += c.b;
 
-            vec3_scalar_mult(&pixel_u, (double) x);
-            vec3_scalar_mult(&pixel_v, (double) y);
-            Vec3 deltas;
-            vec3_vec_add(&pixel_u, &pixel_v, &deltas);
+                
+            }
 
-
-            Vec3 pixel_center;
-
-            vec3_vec_add(&(cam->pixel00_loc), &deltas, &pixel_center);
-
-            Vec3 ray_direction;
-            vec3_vec_sub(&pixel_center, &(cam->center), &ray_direction);
-
-            Ray r;
-            ray_init(&r, cam->center, ray_direction);
-
-            Color pixel_color;
-            pixel_color = ray_color(&r, world);
+            pixel_color.r *= cam->pixel_samples_scale;
+            pixel_color.g *= cam->pixel_samples_scale;
+            pixel_color.b *= cam->pixel_samples_scale;
             write_color(f, &pixel_color);
+
         }
     }
 

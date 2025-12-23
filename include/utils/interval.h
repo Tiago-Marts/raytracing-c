@@ -15,4 +15,8 @@ int interval_contains(Interval* i, double x);
 
 //Retorna 1 se estiver aos arredores e 0 caso contrário
 int interval_surrounds(Interval* i, double x);
+
+//Limita o valor de x para o mínimo e máximo do intervalo
+double clamp(Interval* i, double x);
+
 #endif

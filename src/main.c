@@ -9,6 +9,7 @@ int main(void) {
     Camera cam;
     cam.aspect_ratio = 16.0/9.0;
     cam.width = 800;
+    cam.samples_per_pixel = 100;
 
     //World 
     //NOTA: Por enquanto, tudo é feito de esferas, então há somente a lista de hits para esferas
@@ -41,7 +42,6 @@ int main(void) {
     add_sphere(&world, s4);
 
     //Render
-    printf("%f\n", world.list_sphere[0].center.z);
     render(&cam, &world, "image.ppm");
     free_list(&world);
 

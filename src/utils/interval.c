@@ -21,3 +21,10 @@ int interval_contains(Interval* i, double x){
 int interval_surrounds(Interval* i, double x){
     return (i->min < x && x < i->max) ? 1 : 0;
 }
+
+//Limita o valor de x para o mínimo e máximo do intervalo
+double clamp(Interval* i, double x){
+    if(x < i->min) return i->min;
+    if (x > i->max) return i->max;
+    return x;
+}

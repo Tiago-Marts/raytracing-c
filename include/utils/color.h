@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include <stdio.h>
+#include "../../include/utils/interval.h"
 
 typedef struct color {
     double r;

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../../include/utils/interval.h"
 
 typedef struct color {
     double r;
@@ -13,9 +14,13 @@ void color_init(Color* col, double r, double g, double b){
 }
 
 void write_color(FILE* f, Color* col){
-    int r_byte = (int)(255.999 * col->r);
-    int g_byte = (int)(255.999 * col->g);
-    int b_byte = (int)(255.999 * col->b);
+    Interval intensity;
+    interval_init(&intensity, 0.000, 0.999);
+
+
+    int r_byte = (int)(256 * clamp(&intensity, col->r));
+    int g_byte = (int)(256 * clamp(&intensity, col->g));
+    int b_byte = (int)(256 * clamp(&intensity, col->b));
 
     fputc(r_byte, f);
     fputc(g_byte, f);
