@@ -4,6 +4,7 @@
 #include "../../include/utils/ray.h"
 #include "../../include/utils/interval.h"
 
+
 typedef struct hittable_list{
     size_t index;
     size_t list_capacity;
@@ -44,7 +45,7 @@ void remove_hittable(Hittable_List* h, int index){
     h->list_sphere = tmp;
 }
 
-int hit_list(Hittable_List* h, Ray* r, Interval* ray_t, Hittable* rec){
+int hit_list(Hittable_List* h, Ray* r, Interval* ray_t, Hittable* rec, Material* hit_material){
     Hittable temp_rec;
     int hit_anything = 0;
     double closest = ray_t->max;
@@ -52,6 +53,7 @@ int hit_list(Hittable_List* h, Ray* r, Interval* ray_t, Hittable* rec){
         Interval ray_hit;
         interval_init(&ray_hit, ray_t->min, closest);
         if(hit_sphere(&(h->list_sphere[i]), r, &ray_hit, &temp_rec)){
+            *hit_material = h->list_sphere[i].mat;
             hit_anything = 1;
             closest = temp_rec.t;
             *rec = temp_rec;

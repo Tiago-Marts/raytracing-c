@@ -115,6 +115,16 @@ void vec3_random_hemisphere(Vec3* u, Vec3* normal){
         
 }
 
+//Retorna 1 se o vetor está proximo de 0 em todas as dimensões
+int near_zero(Vec3* u){
+    double s = 1e-8;
+    if(u->x < s && u->y < s && u->z < s) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 //Funções utilitárias
 void vec3_print(Vec3* u){
     printf("%f, %f, %f", u->x, u->y, u->z);

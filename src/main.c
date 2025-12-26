@@ -1,5 +1,6 @@
 #include "../include/utils/common.h"
 #include "../include/utils/sphere.h"
+#include "../include/utils/material.h"
 #include "../include/utils/hittables_list_sphere.h"
 #include "../include/utils/camera.h"
 #include <limits.h>
@@ -18,28 +19,37 @@ int main(void) {
     init_list(&world, 10);
 
 
+
+    Material mat1;
+    Color col1 = {0.5, 0.5, 0.5};
+    init_material(&mat1, "dif", col1 );
+
+    Material mat2;
+    Color col2 = {0.5, 0.5, 0.5};
+    init_material(&mat2, "dif", col2 );
+
     //Esfera 1
     Sphere s;
     Vec3 s_center = {0, 0, -1.0};
-    sphere_init(&s, s_center, 0.5);
+    sphere_init(&s, s_center, 0.5, mat1);
     add_sphere(&world, s);
 
     //Esfera 2
     Sphere s2;
     Vec3 s2_center = {0, -100.5, -1.0};
-    sphere_init(&s2, s2_center, 100);
+    sphere_init(&s2, s2_center, 100, mat2);
     add_sphere(&world, s2);
 
     //Esfera 3
     Sphere s3;
     Vec3 s3_center = {0.75, 0, -1.5};
-    sphere_init(&s3, s3_center, 0.25);
+    sphere_init(&s3, s3_center, 0.25, mat1);
     //add_sphere(&world, s3);
 
     //Esfera 4
     Sphere s4;
     Vec3 s4_center = {-0.25, 0, -0.25};
-    sphere_init(&s4, s4_center, 0.25);
+    sphere_init(&s4, s4_center, 0.25, mat1);
     //add_sphere(&world, s4);
 
     //Render

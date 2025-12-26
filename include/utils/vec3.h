@@ -49,6 +49,8 @@ void vec3_random_unit(Vec3* u);
 //Escolha de um vetor em um hemisfério de raio 1
 void vec3_random_hemisphere(Vec3* u, Vec3* normal);
 
+//Retorna 1 se o vetor está proximo de 0 em todas as dimensões
+int near_zero(Vec3* u);
 
 //Funções utilitárias
 void vec3_print(Vec3* u);

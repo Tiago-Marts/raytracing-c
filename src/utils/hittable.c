@@ -1,5 +1,6 @@
 #include "../../include/utils/vec3.h"
 #include "../../include/utils/ray.h"
+#include "../../include/utils/material.h"
 
 typedef struct hittable{
     Vec3 point;

@@ -3,6 +3,7 @@
 #include "../../include/utils/color.h"
 #include "../../include/utils/interval.h"
 #include "../../include/utils/hittables_list_sphere.h"
+#include <time.h>
 #include <stdio.h>
 
 typedef struct camera {
@@ -123,9 +124,11 @@ void camera_initialize(Camera* cam){
 
 //Obtem a cor dos objetos a partir da lista de colisão
 Color ray_color(Ray* r, Hittable_List* world, int depth){
+    double reflectance =  0.5;
     Hittable hit;
     Interval world_ray;
     interval_init(&world_ray, 0.001, 1000000.0);
+    Material hit_material;
 
     //Não há mais luz para ser coletada
     if (depth <= 0){
@@ -133,20 +136,19 @@ Color ray_color(Ray* r, Hittable_List* world, int depth){
         return max_d;
     }
 
-    if(hit_list(world, r, &world_ray, &hit)){
-        Vec3 direction;
-        vec3_random_unit(&direction);
-        vec3_vec_add(&direction, &(hit.normal), &direction);
+    if(hit_list(world, r, &world_ray, &hit, &hit_material)){
+        Ray scattered;
+        Color attenuation = {0.0, 0.0, 0.0};
 
-        Ray reflected;
-        reflected.origin = hit.point;
-        reflected.direction = direction;
+        if(hit_material.scatter(r, &(hit.point), &(hit.normal), &attenuation, &scattered)){
+            attenuation = hit_material.albedo;
+            Color a = ray_color(&scattered, world, depth-1);
+            attenuation.r *= a.r;
+            attenuation.g *= a.g;
+            attenuation.b *= a.b;
+        }
 
-        Color o = ray_color(&reflected, world, depth-1);
-        o.r *= 0.5;
-        o.g *= 0.5;
-        o.b *= 0.5;
-        return o;
+        return attenuation;
     }
     
     Vec3 unit_direction = r->direction;
@@ -180,7 +182,7 @@ void render(Camera* cam, Hittable_List* world, const char* path){
     fprintf(f, "%d\n", height);
     fprintf(f, "255\n");
 
-
+    time_t before = clock();
     for(int y = 0; y < height ; y++){
         printf("Progresso: %d / %d \n", y+1, height);
         for(int x = 0; x < width; x++){
@@ -204,6 +206,10 @@ void render(Camera* cam, Hittable_List* world, const char* path){
 
         }
     }
+
+    time_t end = clock();
+
+    printf("Elapsed time: %lf\n", difftime(end, before));
 
     fclose(f);
 }

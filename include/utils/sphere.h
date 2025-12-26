@@ -5,14 +5,16 @@
 #include "../../include/utils/ray.h"
 #include "../../include/utils/hittable.h"
 #include "../../include/utils/interval.h"
+#include "../../include/utils/material.h"
 #include <math.h>
 
 typedef struct sphere{
     Vec3 center;
     double radius;
+    Material mat;
 } Sphere;
 
-void sphere_init(Sphere* sphere, Vec3 center, double radius);
+void sphere_init(Sphere* sphere, Vec3 center, double radius, Material mat);
 
 int hit_sphere(Sphere* sphere, Ray* r, Interval* ray_t, Hittable* rec);
 
