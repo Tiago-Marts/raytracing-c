@@ -9,8 +9,8 @@ int main(void) {
     //Camera
     Camera cam;
     cam.aspect_ratio = 16.0/9.0;
-    cam.width = 400;
-    cam.samples_per_pixel = 100;
+    cam.width = 600;
+    cam.samples_per_pixel = 50;
     cam.max_depth = 50;
 
     //World 
@@ -19,38 +19,49 @@ int main(void) {
     init_list(&world, 10);
 
 
+    //Material Difuso
+    Material lambertian;
+    Color lambertian_col = {0.2, 0.7, 0.5};
+    init_material(&lambertian, "dif", lambertian_col );
 
-    Material mat1;
-    Color col1 = {0.5, 0.5, 0.5};
-    init_material(&mat1, "dif", col1 );
+    //Material Chão
+    Material ground;
+    Color ground_col = {0.2, 0.2, 0.2};
+    init_material(&ground, "dif", ground_col );
 
-    Material mat2;
-    Color col2 = {0.5, 0.5, 0.5};
-    init_material(&mat2, "dif", col2 );
+    //Metal Amarelo
+    Material metal_right;
+    Color metal_yellow = {0.8, 0.6, 0.2};
+    init_material(&metal_right, "metal", metal_yellow);
 
-    //Esfera 1
+    //Metal sem cor
+    Material metal_left;
+    Color metal_white = {0.8, 0.8, 0.8};
+    init_material(&metal_left, "metal", metal_white);
+
+    //Esfera Centro
     Sphere s;
-    Vec3 s_center = {0, 0, -1.0};
-    sphere_init(&s, s_center, 0.5, mat1);
+    Vec3 s_center = {0, 0, -1.2};
+    sphere_init(&s, s_center, 0.5, lambertian);
     add_sphere(&world, s);
 
-    //Esfera 2
+    //Esfera que age como chão
     Sphere s2;
     Vec3 s2_center = {0, -100.5, -1.0};
-    sphere_init(&s2, s2_center, 100, mat2);
+    sphere_init(&s2, s2_center, 100, ground);
     add_sphere(&world, s2);
 
-    //Esfera 3
+    //Esfera Esquerda
     Sphere s3;
-    Vec3 s3_center = {0.75, 0, -1.5};
-    sphere_init(&s3, s3_center, 0.25, mat1);
-    //add_sphere(&world, s3);
+    Vec3 s3_center = {-1.0, 0, -1.0};
+    sphere_init(&s3, s3_center, 0.5, metal_left);
+    add_sphere(&world, s3);
 
-    //Esfera 4
+    //Esfera Direita
     Sphere s4;
-    Vec3 s4_center = {-0.25, 0, -0.25};
-    sphere_init(&s4, s4_center, 0.25, mat1);
-    //add_sphere(&world, s4);
+    Vec3 s4_center = {1.0, 0, -1.0};
+    sphere_init(&s4, s4_center, 0.5, metal_right);
+    add_sphere(&world, s4);
 
     //Render
     render(&cam, &world, "image.ppm");

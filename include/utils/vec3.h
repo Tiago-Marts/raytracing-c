@@ -52,6 +52,10 @@ void vec3_random_hemisphere(Vec3* u, Vec3* normal);
 //Retorna 1 se o vetor está proximo de 0 em todas as dimensões
 int near_zero(Vec3* u);
 
+//Reflete o vetor no ponto n
+void vec3_reflect(Vec3* v, Vec3* n);
+
+
 //Funções utilitárias
 void vec3_print(Vec3* u);
 

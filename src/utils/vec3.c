@@ -118,11 +118,22 @@ void vec3_random_hemisphere(Vec3* u, Vec3* normal){
 //Retorna 1 se o vetor está proximo de 0 em todas as dimensões
 int near_zero(Vec3* u){
     double s = 1e-8;
-    if(u->x < s && u->y < s && u->z < s) {
-        return 1;
+    if(u->x < s && u->y < s) {
+        if(u->z < s) {
+            return 1;
+        }
+        return 0;
     } else {
         return 0;
     }
+}
+
+//Reflete o vetor no ponto n
+void vec3_reflect(Vec3* v, Vec3* n){
+    Vec3 projection = *n;
+    double b = 2 * vec3_dot_prod(v, n);
+    vec3_scalar_mult(&projection, b);
+    vec3_vec_sub(v, &projection, v);
 }
 
 //Funções utilitárias

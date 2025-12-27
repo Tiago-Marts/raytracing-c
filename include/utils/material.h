@@ -4,6 +4,7 @@
 #include "../../include/utils/color.h"
 #include "../../include/utils/ray.h"
 #include "../../include/utils/lambertian.h"
+#include "../../include/utils/metal.h"
 #include <string.h>
 
 typedef int (*scatter_func)(Ray* , Vec3*, Vec3*, Color*, Ray*);

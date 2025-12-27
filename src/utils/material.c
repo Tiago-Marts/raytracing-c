@@ -1,6 +1,7 @@
 #include "../../include/utils/color.h"
 #include "../../include/utils/ray.h"
 #include "../../include/utils/lambertian.h"
+#include "../../include/utils/metal.h"
 #include <string.h>
 
 typedef int (*scatter_func)(Ray* , Vec3*, Vec3*, Color*, Ray*);
@@ -16,8 +17,13 @@ typedef struct material {
 scatter_func define_material(const char* tipo){
     scatter_func func_ptr;
 
+    //TODO: fazer um switch
     if(strcmp(tipo, "dif") == 0){
         func_ptr = &scatter_lambertian;
+    }
+
+    if(strcmp(tipo, "metal") == 0){
+        func_ptr = &scatter_metal;
     }
 
     return func_ptr;
