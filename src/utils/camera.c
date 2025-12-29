@@ -124,7 +124,6 @@ void camera_initialize(Camera* cam){
 
 //Obtem a cor dos objetos a partir da lista de colisão
 Color ray_color(Ray* r, Hittable_List* world, int depth){
-    double reflectance =  0.5;
     Hittable hit;
     Interval world_ray;
     interval_init(&world_ray, 0.001, 1000000.0);
@@ -138,17 +137,21 @@ Color ray_color(Ray* r, Hittable_List* world, int depth){
 
     if(hit_list(world, r, &world_ray, &hit, &hit_material)){
         Ray scattered;
-        Color attenuation = {0.0, 0.0, 0.0};
-
-        if(hit_material.scatter(r, &(hit.point), &(hit.normal), &attenuation, &scattered)){
-            attenuation = hit_material.albedo;
+        Color attenuation;
+        
+        if(hit_material.scatter(hit_material.material_data, r, &(hit.point), &(hit.normal), hit.front_face, &attenuation, &scattered)){
             Color a = ray_color(&scattered, world, depth-1);
             attenuation.r *= a.r;
             attenuation.g *= a.g;
             attenuation.b *= a.b;
+
+            return attenuation;
         }
 
-        return attenuation;
+        Color c = {0.0, 0.0, 0.0};
+
+
+        return c;
     }
     
     Vec3 unit_direction = r->direction;

@@ -3,23 +3,20 @@
 
 #include "../../include/utils/color.h"
 #include "../../include/utils/ray.h"
-#include "../../include/utils/lambertian.h"
-#include "../../include/utils/metal.h"
-#include <string.h>
 
-typedef int (*scatter_func)(Ray* , Vec3*, Vec3*, Color*, Ray*);
+
+#include "../../include/utils/color.h"
+#include "../../include/utils/ray.h"
+
+
+typedef int (*scatter_func)(void*, Ray* , Vec3*, Vec3*, int, Color*, Ray* );
 
 typedef struct material {
-    const char* tipo;
-    Color albedo;
     scatter_func scatter;
+    void* material_data;
 } Material;
 
-
-
-scatter_func define_material(const char* tipo);
-
-void init_material(Material* mat, const char* tipo, Color albedo);
+void init_material(Material* mat, void* material_data, scatter_func scatter_light);
 
 
 #endif

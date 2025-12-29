@@ -55,6 +55,9 @@ int near_zero(Vec3* u);
 //Reflete o vetor no ponto n
 void vec3_reflect(Vec3* v, Vec3* n);
 
+//Construção de um raio refratado 
+void vec3_refract(Vec3* refracted, Vec3* uv, Vec3* n, double refraction_div);
+
 
 //Funções utilitárias
 void vec3_print(Vec3* u);

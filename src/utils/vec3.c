@@ -92,12 +92,12 @@ void vec3_random_minmax(Vec3* u, double min, double max){
 //Metodo da rejeição para escolha de um vetor unitário
 void vec3_random_unit(Vec3* u){
     while(1){
-        vec3_random_minmax(u, -1.0, 1.0);
+        vec3_random_minmax(u, -1, 1);
         double lensq = vec3_lenght_squared(u);
 
         //Para lidar com imprecisão de floats
         if(1e-160 < lensq && lensq <= 1){
-            vec3_scalar_div(u, lensq);
+            vec3_scalar_div(u, sqrt(lensq));
             return;
         }
     }
@@ -134,6 +134,26 @@ void vec3_reflect(Vec3* v, Vec3* n){
     double b = 2 * vec3_dot_prod(v, n);
     vec3_scalar_mult(&projection, b);
     vec3_vec_sub(v, &projection, v);
+}
+
+//Construção de um raio refratado 
+void vec3_refract(Vec3* refracted, Vec3* uv, Vec3* n, double refraction_div){
+    Vec3 minus_uv = *uv;
+    vec3_scalar_mult(&minus_uv, -1.0);
+    double cos_theta = vec3_dot_prod(&minus_uv, n);
+    cos_theta = cos_theta > 1.0 ? 1.0 : cos_theta;
+
+    Vec3 refracted_perpendicular = *n;
+    vec3_scalar_mult(&refracted_perpendicular, cos_theta);
+    vec3_vec_add(uv, &refracted_perpendicular, &refracted_perpendicular);
+    vec3_scalar_mult(&refracted_perpendicular, refraction_div);
+
+    double parallel_lenght =  -1.0 * sqrt(fabs(1.0 - vec3_lenght_squared(&refracted_perpendicular)));
+    Vec3 refracted_parallel = *n;
+    vec3_scalar_mult(&refracted_parallel, parallel_lenght);
+
+    vec3_vec_add(&refracted_parallel, &refracted_perpendicular, refracted);
+
 }
 
 //Funções utilitárias
