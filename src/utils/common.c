@@ -16,7 +16,7 @@ const double pi = 3.1415926535897932385;
 
 //Funções
 double degrees_to_radians(double degrees){
-    return degrees*pi / 180.0;
+    return (degrees * 3.1415926535897932385 )/ 180.0;
 }
 
 //Retorna um valor entre o start e end com base no valor de t

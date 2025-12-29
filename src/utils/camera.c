@@ -14,10 +14,22 @@ typedef struct camera {
     int height;
     double aspect_ratio;
     int image_height;
+
+    double vfov;
+    Vec3 look_from;
+    Vec3 look_at;
+    Vec3 v_up;
+
+    double defocus_angle;
+    double focus_dist;
+
     Vec3 center;
     Vec3 pixel00_loc;
     Vec3 pixel_delta_u;
     Vec3 pixel_delta_v;
+    Vec3 u, v, w; // Base ortonormal da camera
+    Vec3 defocus_disk_u;
+    Vec3 defocus_disk_v;
 } Camera;
 
 //Constroi um vetor dentro de um quadrado unitário, apontando pra uma direação qualquer nesse quadrado
@@ -28,6 +40,22 @@ void sample_square(Vec3* v){
     v->x = x;
     v->y = y;
     v->z = 0.0;
+}
+
+void defocus_disk_sample(Vec3* point, Vec3 center, Vec3 defocus_u, Vec3 defocus_v){
+    Vec3 p;
+    vec3_random_unit_disk(&p);
+    Vec3 u = defocus_u;
+    vec3_scalar_mult(&u, p.x);
+
+    Vec3 v = defocus_v;
+    vec3_scalar_mult(&v, p.y);
+
+    Vec3 final;
+    vec3_vec_add(&center, &u, &final);
+    vec3_vec_add(&final, &v, &final);
+
+    *point = final;
 }
 
 //Constroi um raio saindo da origem da camera em direção a um ponto aleatório próximo de (i,j)
@@ -48,7 +76,12 @@ void get_ray(Ray* r, Camera* cam, int i, int j){
     vec3_vec_add(&pixel_sample, &pixel_u, &pixel_sample);
     vec3_vec_add(&pixel_sample, &pixel_v, &pixel_sample);
 
-    Vec3 ray_origin = cam->center;
+    Vec3 ray_origin;
+    if(cam->defocus_angle <= 0) {
+        ray_origin = cam->center;
+    } else {
+        defocus_disk_sample(&ray_origin, cam->center, cam->defocus_disk_u, cam->defocus_disk_v);
+    }
     Vec3 ray_direction;
     vec3_vec_sub(&pixel_sample, &ray_origin, &ray_direction);
 
@@ -64,6 +97,9 @@ void camera_initialize(Camera* cam){
     if(cam->samples_per_pixel == 0.0) cam->samples_per_pixel = 10;
     if(cam->max_depth == 0) cam->max_depth = 10;
 
+    if(cam->vfov == 0.0) cam->vfov = 90;
+    if(cam->focus_dist == 0.0) cam->focus_dist = 10.0;
+
      //Image
     double aspect_ratio = cam->aspect_ratio;
     int width = cam->width;
@@ -73,20 +109,34 @@ void camera_initialize(Camera* cam){
     cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
 
     //Viewport & Camera
-    const double focal_lenght = 1.0; //Focal lenght é a distância do centro do viewport ao centro da câmera
-    const double viewport_height = 2.0;
+    Vec3 cam_direction = cam->look_from;
+    vec3_vec_sub(&cam_direction, &(cam->look_at), &cam_direction);
+    double theta = degrees_to_radians(cam->vfov);
+    double h = tan(theta/2);
+    const double viewport_height = 2.0 * h * cam->focus_dist;
     const double viewport_width = viewport_height * ( ((double) width) / height);
-    Vec3 camera_origin = {0.0, 0.0, 0.0};
 
-    cam->center = camera_origin;
+
+    cam->center = cam->look_from;
+
+    //Calculando as bases ortonormais
+    Vec3 w = cam_direction;
+    vec3_normalize(&w);
+
+    Vec3 u;
+    vec3_cross_prod(&(cam->v_up), &w, &u);
+    vec3_normalize(&u);
+
+    Vec3 v;
+    vec3_cross_prod(&w, &u, &v);
 
     //Para seguir a convenção de (0,0) no topo à esquerda utilizamos vetores auxiliares para calcular o espaçamento dos pixels
     // Mais detalhamento em https://raytracing.github.io/books/RayTracingInOneWeekend.html
-    Vec3 viewport_u;
-    vec3_init(&viewport_u, viewport_width, 0.0, 0.0);
+    Vec3 viewport_u = u;
+    vec3_scalar_mult(&viewport_u, viewport_width);
 
-    Vec3 viewport_v;
-    vec3_init(&viewport_v,0.0, -viewport_height, 0.0);
+    Vec3 viewport_v = v;
+    vec3_scalar_mult(&viewport_v, -1.0 * viewport_height);
 
     //Calcula o espçamento com base nos vetores anteriores
     Vec3 pixel_delta_u = viewport_u;
@@ -101,15 +151,16 @@ void camera_initialize(Camera* cam){
     //Define a posição do pixel do topo a esquerda (nosso (0,0))
     Vec3 viewport_u_half = viewport_u;
     Vec3 viewport_v_half = viewport_v;
-    Vec3 view_focal;
 
-    vec3_init(&view_focal, 0.0, 0.0, focal_lenght);
+    Vec3 view_focal = w;
+    vec3_scalar_mult(&view_focal, cam->focus_dist);
+    
     vec3_scalar_div(&viewport_u_half, 2.0);
     vec3_scalar_div(&viewport_v_half, 2.0);
 
     Vec3 viewport_upper_left;
     
-    vec3_vec_sub(&camera_origin, &view_focal, &viewport_upper_left);
+    vec3_vec_sub(&(cam->center), &view_focal, &viewport_upper_left);
     vec3_vec_sub(&viewport_upper_left, &viewport_u_half, &viewport_upper_left);
     vec3_vec_sub(&viewport_upper_left, &viewport_v_half, &viewport_upper_left);
 
@@ -120,6 +171,16 @@ void camera_initialize(Camera* cam){
     Vec3 pixel00_loc;
     vec3_vec_add(&viewport_upper_left, &pixel_deltas, &pixel00_loc);
     cam->pixel00_loc = pixel00_loc;
+
+    //Calcula os vetores base do disco de desfoque da camera
+    double defocus_radius = cam->focus_dist * tan(degrees_to_radians(cam->defocus_angle / 2.0));
+    Vec3 defocus_disk_u = u;
+    vec3_scalar_mult(&defocus_disk_u, defocus_radius);
+    cam->defocus_disk_u = defocus_disk_u;
+
+    Vec3 defocus_disk_v = v;
+    vec3_scalar_mult(&defocus_disk_v, defocus_radius);
+    cam->defocus_disk_v = defocus_disk_v;
 }
 
 //Obtem a cor dos objetos a partir da lista de colisão

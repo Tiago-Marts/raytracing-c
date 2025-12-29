@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+
+
 //Retorna um valor real aleatório entre [0,1)
 double random_double(){
     return rand() / (RAND_MAX + 1.0);

@@ -115,6 +115,18 @@ void vec3_random_hemisphere(Vec3* u, Vec3* normal){
         
 }
 
+//Escolha de um vetor aleatório em um disco de tamanho unitário
+void vec3_random_unit_disk(Vec3* u){
+    while(1){
+        Vec3 p = {random_double_minmax(-1, 1), random_double_minmax(-1, 1), 0};
+
+        if(vec3_lenght_squared(&p) < 1){
+            *u = p;
+            return;
+        }
+    }
+}
+
 //Retorna 1 se o vetor está proximo de 0 em todas as dimensões
 int near_zero(Vec3* u){
     double s = 1e-8;
